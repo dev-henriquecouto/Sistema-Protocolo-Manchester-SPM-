@@ -8,51 +8,164 @@ O sistema recebe sintomas relatados por pacientes, que são processados por uma 
 
 ---
 
-## ✅ FUNCIONALIDADES
+# SPM 1.0 — Triagem com IA (MVP)
 
-### 👤 PARA O PACIENTE
-- 🔐 Login com autenticação segura  
-- 📝 Envio de formulário com sintomas  
-- 🚦 Recebimento do nível de prioridade (Verde, Amarelo, Laranja ou Vermelho)  
-- ⏱️ Estimativa de tempo para atendimento  
-
-### 🏥 PARA O HOSPITAL / ADMINISTRADORES
-- 📋 Visualização da fila de pacientes com classificação por prioridade  
-- ✅ Validação e edição dos dados gerados pela IA  
-- 🔄 Controle de fluxo de entrada e status dos atendimentos  
-- 📊 Geração e exportação de relatórios para análise  
+> Sistema de Priorização de Manchester (SPM) com apoio de IA para classificar risco e organizar a fila de atendimento. Projeto acadêmico/protótipo.
 
 ---
 
-## 🌐 ACESSO
+## Integrantes do Projeto
 
-O sistema será **hospedado na web** com dois ambientes distintos:
+> **Substitua os placeholders abaixo pelos dados reais antes de publicar o repositório.**
 
-- **🔗 Portal do Paciente**: envio de sintomas e visualização do nível de prioridade.  
-- **🔐 Painel do Hospital**: acesso administrativo para controle e triagem dos atendimentos.
-
----
-
-## 👨‍👩‍👧‍👦 EQUIPE DE DESENVOLVIMENTO
-
-- **Henrique Andrade Couto**  
-  *Desenvolvedor Back-End*  
-
-- **Leo da Rocha**  
-  *Desenvolvedor Back-End*  
-
-- **Janine de Souza**  
-  *Gerente de Projeto*  
-
-- **Mariana Clara**  
-  *Desenvolvedora Front-End*  
+| Nome completo | Matrícula |
+| --- | --- |
+| _Henrique Andrade Couto_ | _12402079_ |
+| _Leonardo da Rocha_ | _12400599_ |
+| _Janine de Souza_ | _12401803_ |
+| _Mariana Clara_ | _12302481_ |
 
 ---
 
-## 📄 LICENÇA
+## Funcionalidades (10)
 
-Este projeto é de uso **estritamente acadêmico**, desenvolvido para fins educacionais e sem fins comerciais.
+1. **Identificação do paciente** via Google One Tap / Sign-In (OIDC) **ou** formulário manual.  
+2. **Cadastro de sessão de triagem** com campos: queixa principal, sintomas, antecedentes, alergias e medicamentos.  
+3. **Registro de consentimento** (LGPD) com IP e User-Agent vinculados à sessão.  
+4. **Classificação automática por IA (Gemini 2.0 Flash)** com **fallback por palavras‑chave** quando a API key não está configurada/indisponível.  
+5. **Geração de código de chamada** (formato `ABC-123`) por sessão de triagem.  
+6. **Fila de atendimento** ordenada por **prioridade prevista/final** e **tempo de entrada**, com **busca** e **filtro por prioridade**.  
+7. **Área do profissional** (login + sessão) para **revisar**, **confirmar prioridade final** e **adicionar observações** por sessão.  
+8. **Chamada de paciente** (remove da fila e registra horário de saída).  
+9. **Painel público de chamadas (TV)** com últimas chamadas e atualização automática a cada 30s.  
+10. **Estatísticas rápidas na fila** (contagem por prioridade) e componentes de UI responsivos com Bootstrap 5.
 
 ---
 
-> 🎓 Projeto desenvolvido como parte da conclusão do curso técnico, com foco em **soluções tecnológicas aplicadas à saúde pública**.
+## Como rodar o projeto
+
+### 1) Pré‑requisitos
+- **PHP 8.1+** (com extensões `pdo_mysql`, `curl`, `mbstring`).
+- **MariaDB 10.4+** (ou MySQL compatível).
+- Navegador moderno.  
+> O projeto é **PHP puro** (sem Composer) e utiliza **Bootstrap/Font Awesome via CDN**.
+
+### 2) Banco de dados
+1. Crie o banco e tabelas importando o script:  
+   ```sql
+   -- No seu cliente SQL (MySQL/MariaDB)
+   SOURCE SPM1.0/SPM(Prot).sql;
+   ```
+2. Opcionalmente, **crie um usuário PROFISSIONAL** para acesso ao painel:
+   ```sql
+   -- gere o hash com: php -r "echo password_hash('admin123', PASSWORD_BCRYPT), PHP_EOL;"
+   INSERT INTO usuarios (nome, email, senha_hash, papel, ativo)
+   VALUES ('Admin Demo', 'admin@spm.local', '<SUBSTITUA_PELO_HASH_BCRYPT>', 'profissional', 1);
+   ```
+
+### 3) Configuração de credenciais
+Edite `SPM1.0/APP/config.php` e ajuste as constantes:
+```php
+// Banco
+const DB_HOST = '127.0.0.1';
+const DB_NAME = 'spm';
+const DB_USER = 'root';
+const DB_PASS = 'senha';
+const DB_CHARSET = 'utf8mb4';
+
+// Google Sign-In (paciente)
+define('GOOGLE_CLIENT_ID', '<SEU_CLIENT_ID>'); // ou mantenha o demo
+
+// IA Gemini (classificação automática)
+define('GEMINI_API_KEY', '<SUA_API_KEY>'); // deixe '' para usar o fallback por palavras‑chave
+```
+> **Atenção:** não publique chaves reais em repositórios públicos.
+
+### 4) Executando (servidor embutido do PHP)
+No diretório **raiz do repositório**, rode:
+```bash
+php -S localhost:8080 -t SPM1.0
+```
+Acesse:
+- Fluxo do paciente: `http://localhost:8080/` → **Iniciar triagem**  
+- Login do profissional: `http://localhost:8080/?r=auth/login`  
+  - Após login: **Fila** `?r=admin/fila`, **Revisão** `?r=admin/sessao&sid=<ID>`, **Painel (TV)** `?r=painel/chamadas`
+
+---
+
+## Estrutura do projeto (resumo)
+
+```
+SPM1.0/
+├─ index.php                # roteador leve por query-string (?r=...)
+├─ SPM(Prot).sql            # schema do banco (MariaDB 10.4+)
+└─ APP/
+   ├─ config.php            # configurações (DB, Google, Gemini)
+   ├─ database.php          # singleton PDO
+   ├─ Controllers/
+   │  ├─ AuthController.php       # login/sessão do profissional + Google para paciente
+   │  ├─ TriagemController.php    # fluxo de triagem + IA + fila
+   │  ├─ FilaController.php       # listagem/estatísticas/UX da fila
+   │  ├─ RevisaoController.php    # revisão e decisão final
+   │  └─ PainelController.php     # painel público de chamadas
+   ├─ Models/
+   │  └─ Usuario.php
+   ├─ Repositories/
+   │  ├─ UsuarioRepository.php
+   │  ├─ TriagemRepository.php
+   │  └─ FilaRepository.php
+   ├─ Services/
+   │  └─ GeminiIAService.php      # integração com Gemini 2.0 Flash
+   └─ Views/
+      ├─ home.php
+      ├─ auth-login.php
+      ├─ triagem-identificar.php
+      ├─ triagem-nova.php
+      ├─ triagem-sucesso.php
+      ├─ fila-index.php
+      ├─ revisao-detalhe.php
+      ├─ painel-chamadas.php
+      └─ includes/header.php
+```
+
+---
+
+## Rotas principais
+
+- `GET /` → Home (CTA **Iniciar triagem**).  
+- `GET /?r=triagem/identificar` → Identificação do paciente (Google ou manual).  
+- `POST /?r=triagem/identificar-post` → Processa identificação/cadastro.  
+- `GET /?r=triagem/nova` → Formulário da triagem.  
+- `POST /?r=triagem/criar` → Cria sessão, registra consentimento, classifica (IA/fallback) e coloca na fila.  
+- `GET /?r=triagem/sucesso&sid=<ID>` → Confirmação com código de chamada.  
+- `GET /?r=auth/login` → Login do profissional.  
+- `GET /?r=admin/fila` → Fila de atendimento (busca/filtro/estatísticas).  
+- `GET /?r=admin/sessao&sid=<ID>` → Revisão da sessão e decisão final.  
+- `POST /?r=admin/sessao/confirmar` → Persiste prioridade final/observações.  
+- `POST /?r=admin/sessao/chamar` → Chama paciente (remove da fila).  
+- `GET /?r=painel/chamadas` → Painel público (TV) com últimas chamadas.
+
+---
+
+## Observações
+
+- **LGPD:** consentimento básico armazenado na tabela `consentimentos`.  
+- **Segurança:** desative exibição de erros em produção, use variáveis de ambiente/secret manager e restrinja acesso ao painel.  
+- **Seeds:** o script SQL não cria usuários por padrão; crie pelo comando SQL indicado ou adapte conforme sua infraestrutura.
+
+---
+
+## Publicação do repositório
+
+Para atender ao edital:
+
+- Publique este código em um **repositório público no GitHub** **OU** adicione o perfil **`gleisonbt`** como **colaborador** (Settings → Collaborators → Add people).  
+- **Não submeta .zip** na entrega — forneça apenas o link do repositório GitHub.
+
+---
+
+### Créditos & Licença
+
+Projeto acadêmico/protótipo para fins educacionais. Sem garantias. Ajuste a licença conforme necessidade da disciplina/curso.
+
+
