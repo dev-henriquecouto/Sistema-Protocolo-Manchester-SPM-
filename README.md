@@ -77,7 +77,6 @@ define('GOOGLE_CLIENT_ID', '<SEU_CLIENT_ID>'); // ou mantenha o demo
 // IA Gemini (classificação automática)
 define('GEMINI_API_KEY', '<SUA_API_KEY>'); // deixe '' para usar o fallback por palavras‑chave
 ```
-> **Atenção:** não publique chaves reais em repositórios públicos.
 
 ### 4) Executando (servidor embutido do PHP)
 No diretório **raiz do repositório**, rode:
