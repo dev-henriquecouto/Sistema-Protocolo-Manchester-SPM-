@@ -145,23 +145,6 @@ SPM1.0/
 
 ---
 
-## Observações
-
-- **LGPD:** consentimento básico armazenado na tabela `consentimentos`.  
-- **Segurança:** desative exibição de erros em produção, use variáveis de ambiente/secret manager e restrinja acesso ao painel.  
-- **Seeds:** o script SQL não cria usuários por padrão; crie pelo comando SQL indicado ou adapte conforme sua infraestrutura.
-
----
-
-## Publicação do repositório
-
-Para atender ao edital:
-
-- Publique este código em um **repositório público no GitHub** **OU** adicione o perfil **`gleisonbt`** como **colaborador** (Settings → Collaborators → Add people).  
-- **Não submeta .zip** na entrega — forneça apenas o link do repositório GitHub.
-
----
-
 ### Créditos & Licença
 
 Projeto acadêmico/protótipo para fins educacionais. Sem garantias. Ajuste a licença conforme necessidade da disciplina/curso.
