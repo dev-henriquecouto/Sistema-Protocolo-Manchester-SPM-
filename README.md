@@ -16,8 +16,6 @@ O sistema recebe sintomas relatados por pacientes, que são processados por uma 
 
 ## Integrantes do Projeto
 
-> **Substitua os placeholders abaixo pelos dados reais antes de publicar o repositório.**
-
 | Nome completo | Matrícula |
 | --- | --- |
 | _Henrique Andrade Couto_ | _12402079_ |
