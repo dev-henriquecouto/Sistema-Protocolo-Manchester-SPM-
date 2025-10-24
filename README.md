@@ -53,7 +53,7 @@ O sistema recebe sintomas relatados por pacientes, que são processados por uma 
 - **MariaDB 10.4+** (ou MySQL compatível).
 - Navegador moderno.
 - Relatórios (DOMPDF via Composer): na raiz do projeto, execute composer require dompdf/dompdf; garanta escrita em /storage/dompdf/{cache,fonts}; e inclua require __DIR__.'/vendor/autoload.php';
-> O projeto é **PHP puro** (sem Composer) e utiliza **Bootstrap/Font Awesome via CDN**.
+> O projeto é **PHP puro** (com Composer) e utiliza **Bootstrap/Font Awesome via CDN**.
 
 ### 2) Banco de dados
 1. Crie o banco e tabelas importando o script:  
