@@ -116,3 +116,40 @@ CREATE TABLE `sequelizemeta` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 COMMIT;
+
+
+INSERT INTO niveis_prioridade (id, codigo, peso_ordenacao, sla_minutos) VALUES
+(1,'AZUL',     1,240),
+(2,'VERDE',    2,120),
+(3,'AMARELO',  3, 60),
+(4,'LARANJA',  4, 30),
+(5,'VERMELHO', 5,  0);
+
+select * from usuarios;
+
+INSERT INTO usuarios (nome, email, senha_hash, papel) 
+VALUES ('Admin', 'admin@spm.local', '$2y$12$zBzjtbHFg4mCLhZtHbDZHO1syvH3E87XlTxpP6syZWougDS5GJcoa', 2);
+
+update usuarios set papel = 2 where email = 'admin@spm.local';
+
+-- Notificações simples, leves e auditáveis
+CREATE TABLE notificacoes (
+  id BIGINT(20) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+  usuario_id BIGINT(20) UNSIGNED NOT NULL,
+  tipo VARCHAR(50) NOT NULL,               -- ex.: 'paciente_chamado'
+  mensagem VARCHAR(255) NOT NULL,          -- texto curto da notificação
+  metadata JSON NULL,                      -- MariaDB 10.4+ aceita JSON (alias de LONGTEXT)
+  lida TINYINT(1) NOT NULL DEFAULT 0,      -- 0 = não lida, 1 = lida
+  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP(),
+  INDEX idx_notif_usuario (usuario_id),
+  CONSTRAINT fk_notif_usuario
+    FOREIGN KEY (usuario_id) REFERENCES usuarios(id)
+    ON DELETE CASCADE
+)
+ENGINE=InnoDB
+DEFAULT CHARSET=utf8mb4
+COLLATE=utf8mb4_unicode_ci;
+
+SHOW CREATE TABLE usuarios;
+SHOW CREATE TABLE notificacoes;
+

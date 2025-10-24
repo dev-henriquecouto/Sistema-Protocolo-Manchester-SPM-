@@ -48,8 +48,29 @@ foreach ($rows as $r) {
     <!-- Barra superior -->
     <div class="d-flex align-items-center justify-content-between mb-3">
       <h2 class="h4 fw-semibold mb-0">Fila de Atendimento</h2>
-      <div class="d-flex gap-2">
-        <a class="btn btn-light btn-sm rounded-xl border-secondary-soft" href="?r=painel/chamadas" target="_blank">
+      <div class="d-flex gap-2 align-items-center">
+
+        <!-- NOVO: Botões de Relatório (PDF) -->
+        <div class="btn-group" role="group" aria-label="Relatórios">
+          <a class="btn btn-outline-secondary btn-sm rounded-xl border-secondary-soft"
+             href="?r=relatorio/atendimentos&period=diario&format=pdf"
+             target="_blank" rel="noopener">
+            <i class="fa-solid fa-file-arrow-down me-1"></i> Diário
+          </a>
+          <a class="btn btn-outline-secondary btn-sm rounded-xl border-secondary-soft"
+             href="?r=relatorio/atendimentos&period=semanal&format=pdf"
+             target="_blank" rel="noopener">
+            Semanal
+          </a>
+          <a class="btn btn-outline-secondary btn-sm rounded-xl border-secondary-soft"
+             href="?r=relatorio/atendimentos&period=mensal&format=pdf"
+             target="_blank" rel="noopener">
+            Mensal
+          </a>
+        </div>
+
+        <!-- Botão existente: Abrir Painel -->
+        <a class="btn btn-light btn-sm rounded-xl border-secondary-soft" href="?r=painel/chamadas" target="_blank" rel="noopener">
           <i class="fa-solid fa-tv me-1"></i> Abrir Painel
         </a>
         <a class="btn btn-outline-secondary btn-sm rounded-xl border-secondary-soft" href="?r=auth/sair">

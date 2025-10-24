@@ -49,19 +49,41 @@ final class RevisaoController
     }
 
     public static function chamar(): void
-    {
-        self::exigeLogin();
-        if ($_SERVER['REQUEST_METHOD'] !== 'POST') { header('Location: ?r=admin/fila'); exit; }
+{
+    self::exigeLogin();
+    if ($_SERVER['REQUEST_METHOD'] !== 'POST') { header('Location: ?r=admin/fila'); exit; }
 
-        $sid = (int)($_POST['sid'] ?? 0);
-        if ($sid <= 0) { 
-            $_SESSION['flash'] = 'Sessão inválida.'; 
-            header('Location: ?r=admin/fila'); exit; 
-        }
-
-        TriagemRepository::chamarSessao($sid);
-
-        $_SESSION['flash'] = 'Paciente chamado (removido da fila).';
+    $sessaoId = (int)($_POST['sid'] ?? 0);
+    if ($sessaoId <= 0) {
+        $_SESSION['flash'] = 'Sessão inválida.';
         header('Location: ?r=admin/fila'); exit;
     }
+
+    // 1) Executa a chamada (método estático existente; ignoramos retorno)
+    TriagemRepository::chamarSessao($sessaoId);
+
+    // 2) Publica o evento (best effort, sem quebrar fluxo)
+    global $db;
+    if ($db instanceof \PDO) {
+        $triRepo = new TriagemRepository($db);
+        $resumo  = $triRepo->obterResumoSessao($sessaoId); // método que adicionamos
+
+        if ($resumo) {
+            $eventBus = $GLOBALS['eventBus'] ?? null;
+            if ($eventBus instanceof \APP\Services\EventBus) {
+                $eventBus->publish(\APP\Events\PacienteChamadoEvent::NAME, [
+                    'sessao_id'            => (int)$resumo['sessao_id'],
+                    'paciente_usuario_id'  => (int)$resumo['paciente_usuario_id'],
+                    'codigo_chamada'       => (string)$resumo['codigo_chamada'],
+                    'prioridade'           => $resumo['prioridade'] ? (string)$resumo['prioridade'] : null,
+                ]);
+            }
+        }
+    }
+
+    // 3) Mensagem de sucesso e redirect (mantém comportamento original)
+    $_SESSION['flash'] = 'Paciente chamado (removido da fila).';
+    header('Location: ?r=admin/fila'); exit;
 }
+}
+

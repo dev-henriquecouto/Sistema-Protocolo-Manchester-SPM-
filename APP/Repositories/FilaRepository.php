@@ -25,4 +25,9 @@ final class FilaRepository
                  st.entrada_fila_em ASC";
         return $pdo->query($sql)->fetchAll();
     }
+
+
+
+
+    
 }

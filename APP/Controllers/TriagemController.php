@@ -40,7 +40,7 @@ final class TriagemController
     public static function nova(): void
     {
         if (empty($_SESSION['paciente_id'])) {
-            $_SESSION['flash'] = 'Identifique-se antes de iniciar a triagem.';
+            $_SESSION['flash'] = 'Identifique-se antes de inicir a triagem.';
             header('Location: ?r=triagem/identificar'); exit;
         }
         require __DIR__ . '/../Views/triagem-nova.php';
@@ -163,4 +163,8 @@ final class TriagemController
         // Coloca em fila
         TriagemRepository::colocarEmFila($sessaoId);
     }
+
+
+    //leo
+    
 }

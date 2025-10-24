@@ -119,4 +119,49 @@ final class TriagemRepository
         $st  = $pdo->prepare("UPDATE sessoes_triagem SET status='chamado', saida_fila_em=NOW() WHERE id=?");
         $st->execute([$sessaoId]);
     }
+
+    // leo 
+    public function obterStatusSessao(int $sessaoId): ?string {
+    $pdo = Database::get();
+    $sql = "SELECT status FROM sessoes_triagem WHERE id = ?";
+    $stmt = $pdo->prepare($sql);
+    $stmt->execute([$sessaoId]);
+    $row = $stmt->fetch(\PDO::FETCH_ASSOC);
+    return $row['status'] ?? null;
+    }
+
+    public function obterResumoSessao(int $sessaoId): ?array {
+        $pdo = Database::get();
+        $sql = "SELECT s.id, s.status, s.codigo_chamada, s.paciente_id
+                FROM sessoes_triagem s
+                WHERE s.id = ?";
+        $stmt = $pdo->prepare($sql);
+        $stmt->execute([$sessaoId]);
+        $row = $stmt->fetch(\PDO::FETCH_ASSOC);
+        return $row ?: null;
+    }
+
+    public function obterUsuarioIdPorCodigoChamada(string $codigo): ?int
+{
+    $pdo = Database::get();
+    $sql = " SELECT
+            st.id AS sessao_id,
+            st.paciente_usuario_id,
+            st.codigo_chamada,
+            COALESCE(npf.codigo, npp.codigo) AS prioridade
+        FROM sessoes_triagem st
+        LEFT JOIN revisoes_profissionais rp ON rp.sessao_id = st.id
+        LEFT JOIN niveis_prioridade npf ON npf.codigo = rp.prioridade_final
+        LEFT JOIN avaliacoes_ia ai ON ai.sessao_id = st.id
+        LEFT JOIN niveis_prioridade npp ON npp.codigo = ai.prioridade_prevista
+        WHERE st.codigo_chamada = :codigo
+        LIMIT 1";
+    $stmt = $pdo->prepare($sql);
+    $stmt->bindValue(':codigo', $codigo, \PDO::PARAM_STR);
+    $stmt->execute();
+    $row = $stmt->fetch(\PDO::FETCH_ASSOC);
+    return $row ? (int)$row['paciente_usuario_id'] : null;
+}
+
+
 }

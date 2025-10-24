@@ -1,7 +1,45 @@
 <?php
 session_start();
+
 // Database 
 require_once __DIR__ . '/APP/database.php';
+
+// Exponha a conexão PDO de forma explícita (qualquer nome que o database.php usar)
+if (isset($pdo) && $pdo instanceof PDO) {
+    $GLOBALS['pdo'] = $pdo;
+}
+if (isset($db) && $db instanceof PDO) {
+    $GLOBALS['db'] = $db;
+    if (!isset($GLOBALS['pdo'])) { $GLOBALS['pdo'] = $db; }
+}
+if (isset($conn) && $conn instanceof PDO) {
+    $GLOBALS['conn'] = $conn;
+    if (!isset($GLOBALS['pdo'])) { $GLOBALS['pdo'] = $conn; }
+}
+
+
+/* =========================[ INÍCIO DAS INCLUSÕES NOVAS ]========================= */
+// Services / EventBus (novo)
+require_once __DIR__ . '/APP/Services/EventBus.php';
+
+// Repositório e Observer da notificação (novos)
+require_once __DIR__ . '/APP/Repositories/NotificacaoRepository.php';
+require_once __DIR__ . '/APP/Observers/NotificarPacienteChamadoObserver.php';
+
+// Evento de domínio (novo)
+require_once __DIR__ . '/APP/Events/PacienteChamadoEvent.php';
+
+use APP\Services\EventBus;
+
+// Instancia o EventBus para este request (novo)
+$eventBus = new EventBus();
+
+// Disponibiliza globalmente (evita alterar construtores existentes) (novo)
+$GLOBALS['eventBus'] = $eventBus;
+
+// Registra os observers (precisa do $db/$pdo e $eventBus) (novo)
+require_once __DIR__ . '/APP/bootstrap_observers.php';
+/* ==========================[ FIM DAS INCLUSÕES NOVAS ]========================== */
 
 // Controllers
 require_once __DIR__ . '/APP/Controllers/AuthController.php';
@@ -9,6 +47,8 @@ require_once __DIR__ . '/APP/Controllers/TriagemController.php';
 require_once __DIR__ . '/APP/Controllers/FilaController.php';
 require_once __DIR__ . '/APP/Controllers/RevisaoController.php';
 require_once __DIR__ . '/APP/Controllers/PainelController.php';
+require_once __DIR__ . '/APP/Controllers/NotificacaoController.php';
+require_once __DIR__ . '/APP/Controllers/RelatorioController.php';
 
 // Roteador mínimo por query string (?r=controller/acao)
 $r = $_GET['r'] ?? '';
@@ -34,7 +74,8 @@ switch ($r) {
         break;
 
     case 'auth/google-paciente':
-        AuthController::googlePaciente(); break;
+        AuthController::googlePaciente();
+        break;
 
     // PACIENTE – Identificação + Triagem
     case 'triagem/identificar':
@@ -57,6 +98,25 @@ switch ($r) {
 
     case 'triagem/sucesso':
         TriagemController::sucesso();
+        break;
+
+    // RELATÓRIO (Profissional): diário/semanal/mensal
+    case 'relatorio/atendimentos':
+        if (empty($_SESSION['user_id'])) { header('Location: ?r=auth/login'); exit; }
+        \APP\Controllers\RelatorioController::atendimentos();
+        break;
+
+    // API — Notificações do paciente (JSON)
+    case 'api/notificacoes':
+        // GET: lista não lidas (identificação por sessão ou ?codigo=ABC-123 na 1ª chamada)
+        if ($_SERVER['REQUEST_METHOD'] !== 'GET') { http_response_code(405); exit; }
+        \APP\Controllers\NotificacaoController::listar();
+        break;
+
+    case 'api/notificacoes/marcar':
+        // POST: marca IDs como lidas do próprio paciente
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') { http_response_code(405); exit; }
+        \APP\Controllers\NotificacaoController::marcar();
         break;
 
     // PAINEL DO PROFISSIONAL (Fila + Revisão + Chamada)
