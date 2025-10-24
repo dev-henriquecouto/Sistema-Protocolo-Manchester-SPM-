@@ -25,7 +25,7 @@ O sistema recebe sintomas relatados por pacientes, que são processados por uma 
 
 ---
 
-## Funcionalidades (10)
+## Funcionalidades (20)
 
 1. **Identificação do paciente** via Google One Tap / Sign-In (OIDC) **ou** formulário manual.  
 2. **Cadastro de sessão de triagem** com campos: queixa principal, sintomas, antecedentes, alergias e medicamentos.  
@@ -37,6 +37,12 @@ O sistema recebe sintomas relatados por pacientes, que são processados por uma 
 8. **Chamada de paciente** (remove da fila e registra horário de saída).  
 9. **Painel público de chamadas (TV)** com últimas chamadas e atualização automática a cada 30s.  
 10. **Estatísticas rápidas na fila** (contagem por prioridade) e componentes de UI responsivos com Bootstrap 5.
+11. ** Filtro por prioridade no painel (TV) com seleção de prioridades exibidas ** persistência via URL (querystring) e manutenção após autoatualização a cada 30s.
+12. ** Pesquisa de pacientes por nome, documento e código de chamada (ABC-123) ** com tolerância a acentos/typos (normalização) e destaque do termo encontrado.
+13. ** Notificação de chamada ao usuário por e-mail/SMS/WhatsApp/Web Push (configurável) ** com consentimento explícito, rate-limit, templates personalizáveis e log de entregas/falhas.
+14. ** Relatório diário, semanal e mensal **
+15. ** Cards dinâmicos por prioridade (contadores com cor/ícone) ** atualizados em tempo real; clique aplica filtro na fila; tooltips com percentuais e variação vs. período anterior.
+16. ** Controle de prioridade pelo profissional ** com revisão/override da IA, obrigatoriedade de motivo, trilha de auditoria (quem/quando/de→para) e permissões por perfil.
 
 ---
 
@@ -45,7 +51,8 @@ O sistema recebe sintomas relatados por pacientes, que são processados por uma 
 ### 1) Pré‑requisitos
 - **PHP 8.1+** (com extensões `pdo_mysql`, `curl`, `mbstring`).
 - **MariaDB 10.4+** (ou MySQL compatível).
-- Navegador moderno.  
+- Navegador moderno.
+- Relatórios (DOMPDF via Composer): na raiz do projeto, execute composer require dompdf/dompdf; garanta escrita em /storage/dompdf/{cache,fonts}; e inclua require __DIR__.'/vendor/autoload.php';
 > O projeto é **PHP puro** (sem Composer) e utiliza **Bootstrap/Font Awesome via CDN**.
 
 ### 2) Banco de dados
