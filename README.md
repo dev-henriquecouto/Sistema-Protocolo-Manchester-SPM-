@@ -37,12 +37,12 @@ O sistema recebe sintomas relatados por pacientes, que são processados por uma 
 8. **Chamada de paciente** (remove da fila e registra horário de saída).  
 9. **Painel público de chamadas (TV)** com últimas chamadas e atualização automática a cada 30s.  
 10. **Estatísticas rápidas na fila** (contagem por prioridade) e componentes de UI responsivos com Bootstrap 5.
-11. ** Filtro por prioridade no painel (TV) com seleção de prioridades exibidas ** persistência via URL (querystring) e manutenção após autoatualização a cada 30s.
-12. ** Pesquisa de pacientes por nome, documento e código de chamada (ABC-123) ** com tolerância a acentos/typos (normalização) e destaque do termo encontrado.
-13. ** Notificação de chamada ao usuário por e-mail/SMS/WhatsApp/Web Push (configurável) ** com consentimento explícito, rate-limit, templates personalizáveis e log de entregas/falhas.
-14. ** Relatório diário, semanal e mensal **
-15. ** Cards dinâmicos por prioridade (contadores com cor/ícone) ** atualizados em tempo real; clique aplica filtro na fila; tooltips com percentuais e variação vs. período anterior.
-16. ** Controle de prioridade pelo profissional ** com revisão/override da IA, obrigatoriedade de motivo, trilha de auditoria (quem/quando/de→para) e permissões por perfil.
+11. **Filtro por prioridade no painel (TV) com seleção de prioridades exibidas** persistência via URL (querystring) e manutenção após autoatualização a cada 30s.
+12. **Pesquisa de pacientes por nome, documento e código de chamada (ABC-123)** com tolerância a acentos/typos (normalização) e destaque do termo encontrado.
+13. **Notificação de chamada ao usuário por e-mail/SMS/WhatsApp/Web Push (configurável)** com consentimento explícito, rate-limit, templates personalizáveis e log de entregas/falhas.
+14. **Relatório diário, semanal e mensal**
+15. **Cards dinâmicos por prioridade (contadores com cor/ícone)** atualizados em tempo real; clique aplica filtro na fila; tooltips com percentuais e variação vs. período anterior.
+16. **Controle de prioridade pelo profissional** com revisão/override da IA, obrigatoriedade de motivo, trilha de auditoria (quem/quando/de→para) e permissões por perfil.
 
 ---
 
