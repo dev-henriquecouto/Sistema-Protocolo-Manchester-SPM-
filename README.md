@@ -25,7 +25,7 @@ O sistema recebe sintomas relatados por pacientes, que são processados por uma 
 
 ---
 
-## Funcionalidades (20)
+## Funcionalidades (16)
 
 1. **Identificação do paciente** via Google One Tap / Sign-In (OIDC) **ou** formulário manual.  
 2. **Cadastro de sessão de triagem** com campos: queixa principal, sintomas, antecedentes, alergias e medicamentos.  
